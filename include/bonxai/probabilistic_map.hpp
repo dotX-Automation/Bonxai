@@ -2,7 +2,7 @@
 
 #include <eigen3/Eigen/Geometry>
 #include <unordered_set>
-#include "bonxai.hpp"
+#include <bonxai/bonxai.hpp>
 
 namespace Bonxai
 {

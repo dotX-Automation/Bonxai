@@ -1,4 +1,4 @@
-#include "probabilistic_map.hpp"
+#include <bonxai/probabilistic_map.hpp>
 
 namespace Bonxai
 {
