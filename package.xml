@@ -3,7 +3,7 @@
 <package format="3">
   <name>bonxai</name>
   <version>0.0.0</version>
-  <description>bonxai library</description>
+  <description>Bonxai library</description>
   <maintainer email="info@dotxautomation.com">dotX Automation</maintainer>
   <license>Apache-2.0</license>
 
