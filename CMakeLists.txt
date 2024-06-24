@@ -1,89 +1,59 @@
-cmake_minimum_required(VERSION 3.10)
-project(Bonxai)
+cmake_minimum_required(VERSION 3.8)
+project(bonxai)
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 
-  message(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
-
-  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE
-      STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-    "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-fno-omit-frame-pointer -g")
-
-#---- Add the subdirectory cmake ----
-set(CMAKE_CONFIG_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CONFIG_PATH}")
-
-find_package(PCL REQUIRED COMPONENTS common io)
-
-find_package(benchmark QUIET)
-find_package(octomap QUIET)
-find_package(LZ4 QUIET)
-find_package(Eigen3 QUIET)
-
-#---- Use Address sanitizer if compiled in Debug mode ----
-option(BONXAI_SANITIZE "Add address sanitizer when compiling in Debug mode" ON)
-
-if(BONXAI_SANITIZE)
-    set (CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS}  -fsanitize=address")
-    set (CMAKE_LINKER_DEBUG_FLAGS "${CMAKE_LINKER_DEBUG_FLAGS}  -fsanitize=address")
+# Default to C++17
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
-
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -fno-omit-frame-pointer)
+  add_compile_options(-Wall -Wextra -Wpedantic -O3 -march=native)
 endif()
 
+# Find dependencies
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 
-####################################################
-add_subdirectory(bonxai_core)
-add_subdirectory(bonxai_map)
-add_subdirectory(examples)
+# bonxai library configuration
+add_library(bonxai SHARED
+  src/probabilistic_map.cpp)
+target_compile_features(bonxai PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_compile_definitions(bonxai PRIVATE "bonxai_BUILDING_LIBRARY")
+target_include_directories(bonxai PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
-# Default behavior
-find_package(ament_cmake QUIET)
+# Library installation
+install(
+  DIRECTORY include/
+  DESTINATION include)
+install(
+  TARGETS bonxai
+  EXPORT bonxaiTargets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
 
-if ( ament_cmake_FOUND )
-
-    project(bonxai_ros)
-
-    # Add colcon-specific configuration here
-    message(STATUS "Building with colcon")
-
-    find_package(ament_cmake_auto REQUIRED)
-    ament_auto_find_build_dependencies()
-
-    include_directories(bonxai_ros/include 3rdparty)
-
-    ament_auto_add_library(bonxai_server SHARED
-      bonxai_ros/src/bonxai_server.cpp
-    )
-
-    target_link_libraries(bonxai_server
-      bonxai_map
-      ${PCL_LIBRARIES}
-    )
-
-    rclcpp_components_register_node(bonxai_server
-      PLUGIN "bonxai_server::BonxaiServer"
-      EXECUTABLE bonxai_server_node
-    )
-
-
-    ament_auto_package(
-      INSTALL_TO_SHARE
-      bonxai_ros/launch 
-      bonxai_ros/rviz 
-      bonxai_ros/params 
-    )
-
-else()
-
-  message(STATUS "Building with cmake")
-  
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_targets(bonxaiTargets HAS_LIBRARY_TARGET)
+
+ament_package()
