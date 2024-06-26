@@ -20,7 +20,7 @@ const VoxelGrid<ProbabilisticMap::CellT> & ProbabilisticMap::grid() const
   return _grid;
 }
 
-void ProbabilisticMap::setThresMin(const double & thres_min)
+void ProbabilisticMap::setThresMin(const double thres_min)
 {
   _thres_min_log = logods(thres_min);
 }
@@ -30,7 +30,7 @@ double ProbabilisticMap::getThresMin()
   return prob(_thres_min_log);
 }
 
-void ProbabilisticMap::setThresMax(const double & thres_max)
+void ProbabilisticMap::setThresMax(const double thres_max)
 {
   _thres_max_log = logods(thres_max);
 }
@@ -40,7 +40,7 @@ double ProbabilisticMap::getThresMax()
   return prob(_thres_max_log);
 }
 
-void ProbabilisticMap::setThresOccupancy(const double & thres_occupancy)
+void ProbabilisticMap::setThresOccupancy(const double thres_occupancy)
 {
   _thres_occupancy = logods(thres_occupancy);
 }

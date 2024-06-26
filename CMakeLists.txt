@@ -22,8 +22,8 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 
 # bonxai library configuration
-add_library(bonxai SHARED
-  src/probabilistic_map.cpp)
+file(GLOB BONXAI_SRCS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/bonxai/*.cpp")
+add_library(bonxai SHARED ${BONXAI_SRCS})
 target_compile_features(bonxai PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 target_compile_definitions(bonxai PRIVATE "bonxai_BUILDING_LIBRARY")
 target_include_directories(bonxai PUBLIC

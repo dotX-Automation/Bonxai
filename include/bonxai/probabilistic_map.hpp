@@ -76,15 +76,15 @@ public:
 
   [[nodiscard]] const VoxelGrid<CellT> & grid() const;
 
-  void setThresMin(const double & thres_min);
+  void setThresMin(const double thres_min);
 
   double getThresMin();
 
-  void setThresMax(const double & thres_max);
+  void setThresMax(const double thres_max);
 
   double getThresMax();
 
-  void setThresOccupancy(const double & thres_occupancy);
+  void setThresOccupancy(const double thres_occupancy);
 
   /**
    * @brief insertPointCloud will update the probability map
@@ -203,7 +203,7 @@ inline void ProbabilisticMap::insertPointCloud(
     if (squared_norm < max_range_sqr && angle <= max_angle) {
       CellT * cell = _accessor.value(coord, true);
       cell->probability_log = std::max(
-        cell->probability_log + logods(0.35), _thres_min_log);
+        cell->probability_log + logods(prob_miss), _thres_min_log);
     }
   }
   //
