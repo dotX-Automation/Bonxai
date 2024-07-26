@@ -154,6 +154,10 @@ public:
 
   void updateFreeCells(const Vector3D & origin, double prob_miss);
 
+  void increaseProb(const Vector3D & point, double prob_hit);
+  void decreaseProb(const Vector3D & point, double prob_miss);
+  void clear();
+
 private:
   VoxelGrid<CellT> _grid;
   int32_t _thres_min_log = logods(0.12f);
