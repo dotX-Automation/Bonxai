@@ -176,13 +176,12 @@ private:
 template<typename PointT, typename Allocator>
 inline void ProbabilisticMap::insertPointCloud(
   const std::vector<PointT, Allocator> & points,
-  const PointT & origin, const PointT & vect,
+  const PointT & position, const PointT & direction,
   double max_range, double max_angle, double prob_miss, double prob_hit)
 {
-  const auto from = ConvertPoint<Vector3D>(origin);
-  const auto from_vect = ConvertPoint<Vector3D>(vect);
+  const auto from = ConvertPoint<Vector3D>(position);
+  const auto from_dir = ConvertPoint<Vector3D>(direction);
   const auto from_coord = _grid.posToCoord(from);
-  const double max_range_sqr = max_range * max_range;
   //
   std::vector<CoordT> coords;
   getOccupiedVoxels(coords);
@@ -201,10 +200,11 @@ inline void ProbabilisticMap::insertPointCloud(
     if (!ok) {continue;}
     //
     const auto to = ConvertPoint<Vector3D>(_grid.coordToPos(coord));
-    Vector3D vect(to - from);
-    const double squared_norm = vect.squaredNorm();
-    const double angle = std::acos(vect.dot(from_vect) / std::sqrt(squared_norm));
-    if (squared_norm < max_range_sqr && angle <= max_angle) {
+    Vector3D dir = to - from;
+    const double range = dir.norm();
+    dir.normalize();
+    const double angle = std::acos(dir.dot(from_dir));
+    if (range < max_range && angle < max_angle) {
       CellT * cell = _accessor.value(coord, true);
       cell->probability_log = std::max(
         cell->probability_log + logods(prob_miss), _thres_min_log);
@@ -213,14 +213,11 @@ inline void ProbabilisticMap::insertPointCloud(
   //
   for (const auto & point : points) {
     const auto to = ConvertPoint<Vector3D>(point);
-    Vector3D vect(to - from);
-    const double squared_norm = vect.squaredNorm();
-    // points that exceed the max_range will create a cleaning ray
-    if (squared_norm >= max_range_sqr) {
-      // The new point will have distance == max_range from origin
-      const Vector3D new_point = from +
-        ((vect / std::sqrt(squared_norm)) * max_range);
-      addMissPoint(new_point, prob_miss);
+    Vector3D dir = to - from;
+    const double range = dir.norm();
+    dir.normalize();
+    if (range >= max_range) {
+      addMissPoint(from + dir * max_range, prob_miss);
     } else {
       addHitPoint(to, prob_hit);
     }
