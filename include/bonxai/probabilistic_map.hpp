@@ -201,33 +201,33 @@ inline void ProbabilisticMap::insertPointCloud(
   const auto from_dir = ConvertPoint<Vector3D>(direction);
   const auto from_coord = _grid.posToCoord(from);
   //
-  std::vector<CoordT> coords;
-  getOccupiedVoxels(coords);
-  std::vector<CoordT> ray;
-  for (const auto & coord : coords) {
-    //
-    bool ok = true;
-    ray.clear();
-    ComputeRay(from_coord, coord, prob_miss, ray);
-    for (const auto & ray_coord : ray) {
-      CellT * cell = _accessor.value(ray_coord, true);
-      if (cell->probability_log > _thres_occupancy) {
-        ok = false;
-      }
-    }
-    if (!ok) {continue;}
-    //
-    const auto to = ConvertPoint<Vector3D>(_grid.coordToPos(coord));
-    Vector3D dir = to - from;
-    const double range = dir.norm();
-    dir.normalize();
-    const double angle = std::acos(dir.dot(from_dir));
-    if (range < max_range && angle < max_angle) {
-      CellT * cell = _accessor.value(coord, true);
-      cell->probability_log = std::max(
-        cell->probability_log + logods(prob_miss), _thres_min_log);
-    }
-  }
+  // std::vector<CoordT> coords;
+  // getOccupiedVoxels(coords);
+  // std::vector<CoordT> ray;
+  // for (const auto & coord : coords) {
+  //   //
+  //   bool ok = true;
+  //   ray.clear();
+  //   ComputeRay(from_coord, coord, prob_miss, ray);
+  //   for (const auto & ray_coord : ray) {
+  //     CellT * cell = _accessor.value(ray_coord, true);
+  //     if (cell->probability_log > _thres_occupancy) {
+  //       ok = false;
+  //     }
+  //   }
+  //   if (!ok) {continue;}
+  //   //
+  //   const auto to = ConvertPoint<Vector3D>(_grid.coordToPos(coord));
+  //   Vector3D dir = to - from;
+  //   const double range = dir.norm();
+  //   dir.normalize();
+  //   const double angle = std::acos(dir.dot(from_dir));
+  //   if (range < max_range && angle < max_angle) {
+  //     CellT * cell = _accessor.value(coord, true);
+  //     cell->probability_log = std::max(
+  //       cell->probability_log + logods(prob_miss), _thres_min_log);
+  //   }
+  // }
   //
   for (const auto & point : points) {
     const auto to = ConvertPoint<Vector3D>(point);
