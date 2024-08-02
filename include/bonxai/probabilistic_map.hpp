@@ -102,8 +102,7 @@ public:
   template<typename PointT, typename Allocator>
   void insertPointCloud(
     const std::vector<PointT, Allocator> & points,
-    const PointT & origin, const PointT & vector,
-    double max_range, double max_angle, double prob_miss, double prob_hit);
+    const PointT & origin, double max_range, double prob_miss, double prob_hit);
 
   // This function is usually called by insertPointCloud
   // We expose it here to add more control to the user.
@@ -194,44 +193,12 @@ private:
 template<typename PointT, typename Allocator>
 inline void ProbabilisticMap::insertPointCloud(
   const std::vector<PointT, Allocator> & points,
-  const PointT & position, const PointT & direction,
-  double max_range, double max_angle, double prob_miss, double prob_hit)
+  const PointT & origin, double max_range, double prob_miss, double prob_hit)
 {
-  const auto from = ConvertPoint<Vector3D>(position);
-  const auto from_dir = ConvertPoint<Vector3D>(direction);
-  const auto from_coord = _grid.posToCoord(from);
-  //
-  // std::vector<CoordT> coords;
-  // getOccupiedVoxels(coords);
-  // std::vector<CoordT> ray;
-  // for (const auto & coord : coords) {
-  //   //
-  //   bool ok = true;
-  //   ray.clear();
-  //   ComputeRay(from_coord, coord, prob_miss, ray);
-  //   for (const auto & ray_coord : ray) {
-  //     CellT * cell = _accessor.value(ray_coord, true);
-  //     if (cell->probability_log > _thres_occupancy) {
-  //       ok = false;
-  //     }
-  //   }
-  //   if (!ok) {continue;}
-  //   //
-  //   const auto to = ConvertPoint<Vector3D>(_grid.coordToPos(coord));
-  //   Vector3D dir = to - from;
-  //   const double range = dir.norm();
-  //   dir.normalize();
-  //   const double angle = std::acos(dir.dot(from_dir));
-  //   if (range < max_range && angle < max_angle) {
-  //     CellT * cell = _accessor.value(coord, true);
-  //     cell->probability_log = std::max(
-  //       cell->probability_log + logods(prob_miss), _thres_min_log);
-  //   }
-  // }
-  //
+  const auto from = ConvertPoint<Vector3D>(origin);
   for (const auto & point : points) {
     const auto to = ConvertPoint<Vector3D>(point);
-    Vector3D dir = to - from;
+    Vector3D dir(to - from);
     const double range = dir.norm();
     dir.normalize();
     if (range >= max_range) {
