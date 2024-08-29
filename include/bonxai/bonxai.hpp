@@ -655,7 +655,7 @@ inline DataT * VoxelGrid<DataT>::Accessor::value(
 {
   const CoordT inner_key = grid_.getInnerKey(coord);
 
-  if (inner_key != prev_inner_coord_) {
+  if (inner_key != prev_inner_coord_ || prev_leaf_ptr_ == nullptr) {
     prev_leaf_ptr_ = getLeafGrid(coord, create_if_missing);
     prev_inner_coord_ = inner_key;
   }
@@ -681,7 +681,7 @@ inline bool VoxelGrid<DataT>::Accessor::setCellOn(
 {
   const CoordT inner_key = grid_.getInnerKey(coord);
 
-  if (inner_key != prev_inner_coord_) {
+  if (inner_key != prev_inner_coord_ || prev_leaf_ptr_ == nullptr) {
     prev_leaf_ptr_ = getLeafGrid(coord, true);
     prev_inner_coord_ = inner_key;
   }
@@ -699,7 +699,7 @@ inline bool VoxelGrid<DataT>::Accessor::setCellOff(const CoordT & coord)
 {
   const CoordT inner_key = grid_.getInnerKey(coord);
 
-  if (inner_key != prev_inner_coord_) {
+  if (inner_key != prev_inner_coord_ || prev_leaf_ptr_ == nullptr) {
     prev_leaf_ptr_ = getLeafGrid(coord, false);
     prev_inner_coord_ = inner_key;
   }
