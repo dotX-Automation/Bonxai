@@ -139,6 +139,18 @@ void ProbabilisticMap::getOccupiedVoxels(std::vector<CoordT> & coords)
   _grid.forEachCell(visitor);
 }
 
+void ProbabilisticMap::getOccupiedVoxels(std::vector<Vector3D> & points)
+{
+  points.clear();
+  auto visitor = [&](CellT & cell, const CoordT & coord) {
+      if (cell.probability_log > _thres_occupancy) {
+        const auto pos = _grid.coordToPos(coord);
+        points.push_back(Vector3D(pos.x, pos.y, pos.z));
+      }
+    };
+  _grid.forEachCell(visitor);
+}
+
 void ProbabilisticMap::getOccupiedVoxels(std::vector<CoordT> & coords, std::vector<double> & probs)
 {
   coords.clear();
@@ -146,6 +158,22 @@ void ProbabilisticMap::getOccupiedVoxels(std::vector<CoordT> & coords, std::vect
   auto visitor = [&](CellT & cell, const CoordT & coord) {
       if (cell.probability_log > _thres_occupancy) {
         coords.push_back(coord);
+        probs.push_back(prob(cell.probability_log));
+      }
+    };
+  _grid.forEachCell(visitor);
+}
+
+void ProbabilisticMap::getOccupiedVoxels(
+  std::vector<Vector3D> & points,
+  std::vector<double> & probs)
+{
+  points.clear();
+  probs.clear();
+  auto visitor = [&](CellT & cell, const CoordT & coord) {
+      if (cell.probability_log > _thres_occupancy) {
+        const auto pos = _grid.coordToPos(coord);
+        points.push_back(Vector3D(pos.x, pos.y, pos.z));
         probs.push_back(prob(cell.probability_log));
       }
     };

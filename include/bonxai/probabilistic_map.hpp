@@ -122,52 +122,13 @@ public:
 
   void getOccupiedVoxels(std::vector<Bonxai::CoordT> & coords);
 
+  void getOccupiedVoxels(std::vector<Vector3D> & points);
+
   void getOccupiedVoxels(std::vector<Bonxai::CoordT> & coords, std::vector<double> & probs);
 
+  void getOccupiedVoxels(std::vector<Vector3D> & points, std::vector<double> & probs);
+
   void getFreeVoxels(std::vector<Bonxai::CoordT> & coords);
-
-  template<typename PointT>
-  void getOccupiedVoxels(
-    std::vector<PointT> & voxels,
-    const Vector3D mins, const Vector3D maxs)
-  {
-    std::vector<Bonxai::CoordT> coords;
-    getOccupiedVoxels(coords);
-    voxels.clear();
-    for (size_t i = 0; i < coords.size(); i++) {
-      const auto pos = _grid.coordToPos(coords[i]);
-      if (
-        mins.x() <= pos.x && pos.x <= maxs.x() &&
-        mins.y() <= pos.y && pos.y <= maxs.y() &&
-        mins.z() <= pos.z && pos.z <= maxs.z())
-      {
-        voxels.emplace_back(pos.x, pos.y, pos.z);
-      }
-    }
-  }
-
-  template<typename PointT>
-  void getOccupiedVoxels(
-    std::vector<PointT> & voxels, std::vector<double> & probs,
-    const Vector3D mins, const Vector3D maxs)
-  {
-    std::vector<Bonxai::CoordT> coords;
-    std::vector<double> logs;
-    getOccupiedVoxels(coords, logs);
-    voxels.clear();
-    probs.clear();
-    for (size_t i = 0; i < coords.size(); i++) {
-      const auto pos = _grid.coordToPos(coords[i]);
-      if (
-        mins.x() <= pos.x && pos.x <= maxs.x() &&
-        mins.y() <= pos.y && pos.y <= maxs.y() &&
-        mins.z() <= pos.z && pos.z <= maxs.z())
-      {
-        voxels.emplace_back(pos.x, pos.y, pos.z);
-        probs.push_back(logs[i]);
-      }
-    }
-  }
 
   void updateFreeCells(const Vector3D & origin, double prob_miss);
 
