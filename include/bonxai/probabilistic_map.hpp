@@ -132,9 +132,9 @@ public:
 
   void updateFreeCells(const Vector3D & origin, double prob_miss);
 
-  void increaseProb(const Vector3D & point, double prob_hit);
-  void decreaseProb(const Vector3D & point, double prob_miss);
-  void clear();
+  void clearVoxel(const Vector3D & point);
+
+  void clearVoxels();
 
 private:
   VoxelGrid<CellT> _grid;

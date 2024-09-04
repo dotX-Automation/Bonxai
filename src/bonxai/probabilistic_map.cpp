@@ -191,23 +191,14 @@ void ProbabilisticMap::getFreeVoxels(std::vector<CoordT> & coords)
   _grid.forEachCell(visitor);
 }
 
-void ProbabilisticMap::increaseProb(const Vector3D & point, double prob_hit)
+void ProbabilisticMap::clearVoxel(const Vector3D & point)
 {
   const auto coord = _grid.posToCoord(point);
   CellT * cell = _accessor.value(coord, true);
-  cell->probability_log = std::min(
-    cell->probability_log + logods(prob_hit), _thres_max_log);
+  cell->probability_log = UnknownProbability;
 }
 
-void ProbabilisticMap::decreaseProb(const Vector3D & point, double prob_miss)
-{
-  const auto coord = _grid.posToCoord(point);
-  CellT * cell = _accessor.value(coord, true);
-  cell->probability_log = std::max(
-    cell->probability_log + logods(prob_miss), _thres_min_log);
-}
-
-void ProbabilisticMap::clear()
+void ProbabilisticMap::clearVoxels()
 {
   auto visitor = [&](CellT & cell, const CoordT & coord) {
       (void) coord;
